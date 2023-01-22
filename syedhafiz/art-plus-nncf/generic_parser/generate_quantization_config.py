@@ -32,6 +32,9 @@ BITWIDTH_ASSIGNMENT_MODES = ['strict', 'liberal']
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--save_json', type=str, dest='save_json', required=True,
+                        help="Name of json file to save output.")
+    
     #input_info
     parser.add_argument('--sample_size', type=str, dest='sample_size', required=True,
                         help=("Shape of the tensor expected as input to the model."))
@@ -203,7 +206,8 @@ def main():
     args = parse_args()
     input_info = InputInfo(args.sample_size)
     quantization = Quantization(args.algorithm)
-
+    save_json_name = args.save_json
+    
     batchnorm_adaptation = BatchnormAdaptation()
     quantization_range = QuantizationRange()
     range_params = RangeParams()
@@ -282,29 +286,8 @@ def main():
         res_dict['compression']['activations'] = generate_dict(activations)
 
 
-    print(json.dumps(res_dict, indent=2))
-    """
-    #input_info_dict = generate_dict(input_info)
-    #quantization_dict = generate_dict(quantization)
-    #batchnorm_adaptation_dict = generate_dict(batchnorm_adaptation)
-    #quantization_range_dict = generate_dict(quantization_range)
-    #range_params_dict = generate_dict(range_params)
-    #precision_dict = generate_dict(precision)
-    #quantization_params_dict = generate_dict(quantization_params)
-    #weights_dict = generate_dict(weights)
-    #activations_dict = generate_dict(activations)
-
-
-    print(input_info_dict)
-    print(quantization_dict)
-    print(batchnorm_adaptation_dict)
-    print(quantization_range_dict)
-    print(range_params_dict)
-    print(precision_dict)
-    print(quantization_params_dict)
-    print(weights_dict)
-    print(activations_dict)
-    """
+    with open(save_json_name, 'w') as f:
+        json.dump(res_dict, f)
 
 if __name__ == '__main__':
     main()
